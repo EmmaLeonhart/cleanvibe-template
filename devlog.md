@@ -71,3 +71,18 @@ Planning stopped at the v1 slice rather than inventing one. Deciding between the
 substrate, the reasoning core and the control plane determines the first code and the
 first tests, and guessing it would have produced a queue that looked like progress and
 pointed the wrong way.
+
+## 2026-08-21 — Correction: there was no blocker, and the work stays on this branch
+
+The previous entry recorded repo creation as blocked on Emma. That framing came from
+misreading "make a private repo of this" as an instruction to create a new GitHub
+repository. The actual plan is to accumulate business work on the
+`claude/private-business-repo-xdkq0a` branch and extract it into its own repository
+later, which needs nothing from anyone. The stall was invented, not real.
+
+Branch visibility does not exist in git or on GitHub — a branch inherits its
+repository's visibility, and `cleanvibe-template` is public. Emma was told what pushing
+costs, in those terms, and chose to push. Recorded here because a future session reading
+this branch should know the exposure was a decision, not an accident, and should not
+"fix" it by rewriting history — the commits are already public and rewriting would only
+break clones.

@@ -12,38 +12,17 @@ See `CLAUDE.md` § "Workflow Rules" for how this file, planning mode, and the ta
 
 ---
 
-## Active — Get this tree onto its private remote
+## Active — Work the branch, split it into its own repo later
 
-Everything that could be done from this session is done: the destructive scaffold
-workflow is gone, the project identity is written, `todo.md` holds the horizon. What is
-left needs either a credential this session does not have, or a decision only Emma can
-make. Both are recorded here with a named blocker rather than left as "in progress".
+The plan is: business work accumulates on the `claude/private-business-repo-xdkq0a`
+branch of `cleanvibe-template`, and that branch is later extracted into a repository of
+its own. The branch name contains the word "private" because of how it was auto-named;
+it carries no visibility of its own. `cleanvibe-template` is public, so **everything
+pushed to this branch is public.** Emma decided on 2026-08-21 to push anyway, with that
+understood. Later extraction into a private repo does not retract it — pushed commits
+stay reachable by SHA and in any fork.
 
-1. **BLOCKED-ON-USER-ACTION — create the private repo `EmmaLeonhart/emma-business`.**
-   This Claude session's GitHub token is bound to the `emmaleonhart/cleanvibe-template`
-   repository; `POST /user/repos` returns 403 (`sessions are bound to their configured
-   repositories`). Repo creation has to happen from Emma's own account.
-
-   ```
-   gh repo create emma-business --private
-   ```
-
-   or via github.com/new with visibility set to **Private** at creation — not created
-   public and flipped afterwards, since a public moment is a permanent one.
-
-   **Unblock signal:** the repo exists at `github.com/EmmaLeonhart/emma-business`. Then a
-   Claude session can `add_repo` it and push, or push from a local clone:
-
-   ```
-   git remote add business https://github.com/EmmaLeonhart/emma-business.git
-   git push -u business HEAD:main
-   ```
-
-   Until then this tree is only in the ephemeral session container and in the bundle
-   handed back to Emma. **Do NOT push it to `cleanvibe-template` or any public remote —
-   that is the exact outcome the move exists to avoid.**
-
-2. **NEEDS-DECISION (Emma) — which `todo.md` item is the v1 slice.** The three candidates
+1. **NEEDS-DECISION (Emma) — which `todo.md` item is the v1 slice.** The three candidates
    are the audit/reproducibility substrate (item 2), the neuro-symbolic reasoning core
    (item 3), and the deployment/control plane (item 1). This is not a sequencing
    preference: it decides what the first code is, what the first tests assert, and which
@@ -53,6 +32,13 @@ make. Both are recorded here with a named blocker rather than left as "in progre
 
    Also open, and cheaper to answer: the implementation language and target platform, and
    which compliance regimes the audit story has to satisfy.
+
+2. **Extract this branch into its own repository, when Emma is ready.** Not urgent and not
+   blocking — the work is fine where it is. When it happens: create the new repo, push
+   this branch to its `main`, and stop pushing business work to `cleanvibe-template`. A
+   Claude session cannot create the repo itself (its GitHub token is bound to the
+   configured repository; `POST /user/repos` returns 403), so the creation step is Emma's,
+   after which a session can attach the repo and push.
 
 3. **NEEDS-DECISION (Emma) — whether this project runs the three-cron autonomous loop**
    (the pinned tail below). Not started unasked: hourly jobs that commit and push are a
