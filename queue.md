@@ -23,27 +23,22 @@ work is to move this tree into a private repo of its own and give the project an
 Work these top to bottom. **Delete each item from this file in the same commit that
 completes it, and append a dated entry to `devlog.md`.** Push after every step.
 
-1. **Strip the template-only automation.** Delete `.github/workflows/regenerate-from-cleanvibe.yml`
-   — in a private product repo it is destructive, not helpful (a daily `rsync --delete` of the
-   scaffold over the tree). Keep `.cleanvibe-version` and `.claude/skills/`; the
-   `cleanvibe-update-check` skill is the non-destructive way to stay current on the scaffold.
-
-2. **Create the private repo `EmmaLeonhart/emma-business` and push this tree to its `main`.**
+1. **Create the private repo `EmmaLeonhart/emma-business` and push this tree to its `main`.**
    Private at creation — never public-then-flipped. Keep the existing scaffold history. Do
    NOT push business content to the public `cleanvibe-template` repo or any of its branches.
 
-3. **Write the project identity into `README.md` and `CLAUDE.md`.** Sovereign AI product for
+2. **Write the project identity into `README.md` and `CLAUDE.md`.** Sovereign AI product for
    enterprise: customer-controlled deployment (their own servers, or our cloud with a high
    level of customer control), with local auditability and reproducibility as the core
    product claim, a neuro-symbolic leaning, and interpretability inside that scope. Replace
    the template framing in `README.md` and the `_TODO_` sections in `CLAUDE.md`.
 
-4. **Create `todo.md` — the long-horizon backlog.** Abstract destinations only, derived from
+3. **Create `todo.md` — the long-horizon backlog.** Abstract destinations only, derived from
    the identity above: deployment and control plane, the audit/reproducibility substrate,
    the neuro-symbolic reasoning core, the interpretability surface, enterprise readiness,
    and the commercial track. These are what future queues get decomposed from.
 
-5. **Decompose the first `todo.md` item into a real queue.** Replace this section with
+4. **Decompose the first `todo.md` item into a real queue.** Replace this section with
    concrete, individually-committable implementation steps, keeping the pinned tail below.
    Add `.github/workflows/ci.yml` as soon as there is testable code.
 

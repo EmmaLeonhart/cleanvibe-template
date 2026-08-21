@@ -20,3 +20,15 @@ See `CLAUDE.md` § "Workflow Rules" and `queue.md`'s preamble.
 
 Scaffolded with `cleanvibe new` (cleanvibe v1.17.0). Future entries
 land here as queue items get deleted.
+
+## 2026-08-21 — Stripped the template-only regeneration workflow
+
+Deleted `.github/workflows/regenerate-from-cleanvibe.yml`. It exists to keep the
+public `cleanvibe-template` snapshot current: daily, it reinstalls cleanvibe from
+PyPI and `rsync -a --delete`s a fresh scaffold over the working tree, preserving
+only `.git/`, `.github/` and `.cleanvibe-version`. In a template that is the whole
+point; in a product repo it deletes every file the product adds. Removed rather
+than disabled so no future push can re-arm it by accident.
+
+`.cleanvibe-version` (1.17.0) and `.claude/skills/` stay. The `cleanvibe-update-check`
+skill is the non-destructive path for pulling scaffold updates forward.
