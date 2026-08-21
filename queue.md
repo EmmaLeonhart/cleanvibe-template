@@ -27,18 +27,13 @@ completes it, and append a dated entry to `devlog.md`.** Push after every step.
    Private at creation — never public-then-flipped. Keep the existing scaffold history. Do
    NOT push business content to the public `cleanvibe-template` repo or any of its branches.
 
-2. **Create `todo.md` — the long-horizon backlog.** Abstract destinations only, derived from
-   the identity above: deployment and control plane, the audit/reproducibility substrate,
-   the neuro-symbolic reasoning core, the interpretability surface, enterprise readiness,
-   and the commercial track. These are what future queues get decomposed from.
-
-3. **Decompose the first `todo.md` item into a real queue.** Replace this section with
+2. **Decompose the first `todo.md` item into a real queue.** Replace this section with
    concrete, individually-committable implementation steps, keeping the pinned tail below.
    Add `.github/workflows/ci.yml` as soon as there is testable code.
 
 **Open decisions blocking deeper planning (NEEDS-DECISION — Emma decides):**
 - Which slice is v1: the reasoning core, the audit/reproducibility substrate, or the
-  deployment/control plane. Everything downstream of item 3 depends on this.
+  deployment/control plane. Everything downstream of item 2 depends on this.
 - Whether this session runs the three-cron autonomous loop (the pinned tail below). Not
   started unasked — hourly jobs that commit and push are a standing behaviour, not a side
   effect of "make me a repo".

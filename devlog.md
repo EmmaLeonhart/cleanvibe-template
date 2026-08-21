@@ -45,3 +45,15 @@ over real structure, and interpretability in scope as part of that story. Rename
 Source is Emma's own description this session, not inference from a data lake —
 `data_lake/` is empty apart from its `.gitkeep`, so the bootstrap's "infer the project
 from dropped files" step had nothing to read and was answered directly instead.
+
+## 2026-08-21 — `todo.md` created — the long-horizon backlog
+
+Wrote the project's horizon as six abstract destinations: deployment and control
+plane, audit and reproducibility substrate, neuro-symbolic reasoning core,
+interpretability surface, enterprise readiness, and the commercial track. Future
+queues get decomposed from these.
+
+Two assumptions are named in the file rather than buried: that on-premise and
+managed cloud are one product with two deployment modes, and that the compliance
+regimes customers are held to are not yet known. Both change the shape of the work
+if wrong.
