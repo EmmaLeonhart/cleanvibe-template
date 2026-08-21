@@ -1,4 +1,4 @@
-# cleanvibe-template
+# emma-business
 
 ## Skills
 
@@ -11,10 +11,48 @@ current by the `cleanvibe-update-check` skill.
 - **Updates source:** <https://cleanvibe.emmaleonhart.com/updates.md>
 
 ## Project Description
-_TODO: Describe what this project is about._
+
+Private working repo for a **sovereign AI product for enterprise**. Enterprise customers
+run the system under their own control — on their own servers, or on our cloud service
+configured to give them a high level of control over it. The customer keeps custody of the
+deployment, the data, and the evidence trail.
+
+The core product claim is **local auditability and reproducibility**: the record of how an
+output was produced lives inside the customer's perimeter and is inspectable there without
+us; the same inputs on the same pinned versions reproduce the same outputs, and a past run
+can be replayed rather than re-narrated. The approach leans **neuro-symbolic** — symbolic
+structure carries the parts of the reasoning that must be inspectable, so the audit trail
+is over real structure rather than a post-hoc explanation of a black box.
+**Interpretability** is in scope as a component of that auditability story, not as a
+separate research goal.
+
+This framing comes from Emma directly (2026-08-21) and is the spec until she narrows it.
+Do not quietly widen it: "sovereign" means customer-custody of deployment, data and
+evidence, and every architectural choice is judged against whether it survives running
+entirely inside someone else's perimeter.
 
 ## Architecture and Conventions
-_TODO: Document key decisions, file structure, and patterns as they emerge._
+
+Nothing is built yet, so there is no architecture to document — this section fills in as
+decisions get made, and an empty section is the honest state, not an oversight.
+
+Settled so far:
+
+- **This repo is private and stays private.** It was moved off the public
+  `cleanvibe-template` scaffold precisely so business work is not published. Never push its
+  contents to `cleanvibe-template` or any other public remote.
+- **No scaffold auto-regeneration.** `.github/workflows/regenerate-from-cleanvibe.yml` was
+  deleted: it `rsync --delete`s a fresh cleanvibe scaffold over the tree daily, which is
+  correct for a template snapshot and destructive for a product repo. Pull scaffold updates
+  forward with the `cleanvibe-update-check` skill instead.
+- **Air-gap-first is a design constraint, not a feature flag.** Anything that only works
+  with a call home to us fails the sovereign claim; assume the deployment cannot reach us.
+- **Reproducibility is enforced, not asserted.** Version and seed pinning, content-addressed
+  artifacts, and replayable runs are architecture, and belong in tests as soon as there is
+  code to test.
+
+Open: the v1 slice (reasoning core vs. audit substrate vs. control plane), and the language
+and deployment-target stack — both are NEEDS-DECISION in `queue.md`.
 
 ## Long command series run in strict order
 When the user gives a long series of commands, treat it as a long series of commands to be

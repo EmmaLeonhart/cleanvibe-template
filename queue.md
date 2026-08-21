@@ -1,4 +1,4 @@
-# cleanvibe-template — Work Queue
+# emma-business — Work Queue
 
 **This file is a queue of *concrete, executable steps*, not a state snapshot.** It lists what is being worked on right now. Finished work lives in `devlog.md` (a dated entry) and `git log`; longer-horizon, *abstract* work lives in `todo.md` and gets decomposed into items here when it's ready to execute. **When an item is done, delete it from this file AND append a dated entry to `devlog.md` in the same commit, then push.** Do not add checkmarks, "done" markers, or status indicators in place. If an item is still here, it is not done.
 
@@ -27,24 +27,18 @@ completes it, and append a dated entry to `devlog.md`.** Push after every step.
    Private at creation — never public-then-flipped. Keep the existing scaffold history. Do
    NOT push business content to the public `cleanvibe-template` repo or any of its branches.
 
-2. **Write the project identity into `README.md` and `CLAUDE.md`.** Sovereign AI product for
-   enterprise: customer-controlled deployment (their own servers, or our cloud with a high
-   level of customer control), with local auditability and reproducibility as the core
-   product claim, a neuro-symbolic leaning, and interpretability inside that scope. Replace
-   the template framing in `README.md` and the `_TODO_` sections in `CLAUDE.md`.
-
-3. **Create `todo.md` — the long-horizon backlog.** Abstract destinations only, derived from
+2. **Create `todo.md` — the long-horizon backlog.** Abstract destinations only, derived from
    the identity above: deployment and control plane, the audit/reproducibility substrate,
    the neuro-symbolic reasoning core, the interpretability surface, enterprise readiness,
    and the commercial track. These are what future queues get decomposed from.
 
-4. **Decompose the first `todo.md` item into a real queue.** Replace this section with
+3. **Decompose the first `todo.md` item into a real queue.** Replace this section with
    concrete, individually-committable implementation steps, keeping the pinned tail below.
    Add `.github/workflows/ci.yml` as soon as there is testable code.
 
 **Open decisions blocking deeper planning (NEEDS-DECISION — Emma decides):**
 - Which slice is v1: the reasoning core, the audit/reproducibility substrate, or the
-  deployment/control plane. Everything downstream of item 5 depends on this.
+  deployment/control plane. Everything downstream of item 3 depends on this.
 - Whether this session runs the three-cron autonomous loop (the pinned tail below). Not
   started unasked — hourly jobs that commit and push are a standing behaviour, not a side
   effect of "make me a repo".
