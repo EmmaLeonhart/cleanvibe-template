@@ -57,3 +57,17 @@ Two assumptions are named in the file rather than buried: that on-premise and
 managed cloud are one product with two deployment modes, and that the compliance
 regimes customers are held to are not yet known. Both change the shape of the work
 if wrong.
+
+## 2026-08-21 — Session end: repo creation blocked, planning stopped at the v1 decision
+
+The private repo could not be created from this session. Its GitHub token is bound to
+`emmaleonhart/cleanvibe-template`; `POST /user/repos` returns 403 with "sessions are
+bound to their configured repositories". Nothing was pushed anywhere: pushing this
+content to the public template repo would have published the business plan, which is
+the outcome the whole task exists to prevent. The commits live in the session container
+and in a git bundle handed back to Emma.
+
+Planning stopped at the v1 slice rather than inventing one. Deciding between the audit
+substrate, the reasoning core and the control plane determines the first code and the
+first tests, and guessing it would have produced a queue that looked like progress and
+pointed the wrong way.

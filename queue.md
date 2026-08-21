@@ -12,31 +12,51 @@ See `CLAUDE.md` § "Workflow Rules" for how this file, planning mode, and the ta
 
 ---
 
-## Active — Stand up the private business repo
+## Active — Get this tree onto its private remote
 
-The public `cleanvibe-template` repo is a forkable scaffold that regenerates itself daily
-from PyPI. Business work cannot live there: it is public, and its
-`regenerate-from-cleanvibe` workflow mirrors the scaffold over the working tree with
-`rsync --delete` every morning, which would delete product files. So the first slice of
-work is to move this tree into a private repo of its own and give the project an identity.
+Everything that could be done from this session is done: the destructive scaffold
+workflow is gone, the project identity is written, `todo.md` holds the horizon. What is
+left needs either a credential this session does not have, or a decision only Emma can
+make. Both are recorded here with a named blocker rather than left as "in progress".
 
-Work these top to bottom. **Delete each item from this file in the same commit that
-completes it, and append a dated entry to `devlog.md`.** Push after every step.
+1. **BLOCKED-ON-USER-ACTION — create the private repo `EmmaLeonhart/emma-business`.**
+   This Claude session's GitHub token is bound to the `emmaleonhart/cleanvibe-template`
+   repository; `POST /user/repos` returns 403 (`sessions are bound to their configured
+   repositories`). Repo creation has to happen from Emma's own account.
 
-1. **Create the private repo `EmmaLeonhart/emma-business` and push this tree to its `main`.**
-   Private at creation — never public-then-flipped. Keep the existing scaffold history. Do
-   NOT push business content to the public `cleanvibe-template` repo or any of its branches.
+   ```
+   gh repo create emma-business --private
+   ```
 
-2. **Decompose the first `todo.md` item into a real queue.** Replace this section with
-   concrete, individually-committable implementation steps, keeping the pinned tail below.
-   Add `.github/workflows/ci.yml` as soon as there is testable code.
+   or via github.com/new with visibility set to **Private** at creation — not created
+   public and flipped afterwards, since a public moment is a permanent one.
 
-**Open decisions blocking deeper planning (NEEDS-DECISION — Emma decides):**
-- Which slice is v1: the reasoning core, the audit/reproducibility substrate, or the
-  deployment/control plane. Everything downstream of item 2 depends on this.
-- Whether this session runs the three-cron autonomous loop (the pinned tail below). Not
-  started unasked — hourly jobs that commit and push are a standing behaviour, not a side
-  effect of "make me a repo".
+   **Unblock signal:** the repo exists at `github.com/EmmaLeonhart/emma-business`. Then a
+   Claude session can `add_repo` it and push, or push from a local clone:
+
+   ```
+   git remote add business https://github.com/EmmaLeonhart/emma-business.git
+   git push -u business HEAD:main
+   ```
+
+   Until then this tree is only in the ephemeral session container and in the bundle
+   handed back to Emma. **Do NOT push it to `cleanvibe-template` or any public remote —
+   that is the exact outcome the move exists to avoid.**
+
+2. **NEEDS-DECISION (Emma) — which `todo.md` item is the v1 slice.** The three candidates
+   are the audit/reproducibility substrate (item 2), the neuro-symbolic reasoning core
+   (item 3), and the deployment/control plane (item 1). This is not a sequencing
+   preference: it decides what the first code is, what the first tests assert, and which
+   of the two named assumptions in `todo.md` gets tested first. Nothing concrete can be
+   queued under it without the answer, so this is where planning stops rather than
+   continuing on a guess.
+
+   Also open, and cheaper to answer: the implementation language and target platform, and
+   which compliance regimes the audit story has to satisfy.
+
+3. **NEEDS-DECISION (Emma) — whether this project runs the three-cron autonomous loop**
+   (the pinned tail below). Not started unasked: hourly jobs that commit and push are a
+   standing behaviour, and "make me a repo and a plan" does not authorise one.
 
 ---
 
