@@ -25,3 +25,8 @@ Thumbs.db
 # Environment
 .env
 .env.local
+
+# One-off scripts, throwaway experiments and temporary downloads. Never
+# committed, so they cannot pile up as crud. Promote a script out of here only
+# once it will be run again.
+scratch/

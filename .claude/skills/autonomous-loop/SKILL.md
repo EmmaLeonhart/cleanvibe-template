@@ -1,36 +1,57 @@
 ---
 name: autonomous-loop
-description: Use when starting any session of relatively extensive or large-scale autonomous work — above all any large-scale population of queue.md with created tasks — to run the three local-cron productivity playbook (work-loop, auto-flush, status-report).
+description: Use when the user wants a long stretch of autonomous work (hours, overnight, or while they are away) — set up one local cron that every half hour commits and pushes everything and keeps working the queue. Also use when deciding whether that cron should keep running.
 ---
 
-# Autonomous productivity loop — the three-cron playbook
+# Autonomous loop — one cron, every half hour
 
-**For any session involving relatively extensive work — above all, any large-scale population of `queue.md` with created tasks — this is the default way of working.** It is three local `CronCreate` jobs that turn "barrel through `queue.md`, and when it's empty atomise the next `todo.md` item into it" into a self-sustaining hourly cadence with a commit/push backstop and a heartbeat. The crons are **session-local** (`durable: false` — they die when the session ends), so they are recreated at the start of every session.
+When the user wants you to keep working on your own for a long stretch (hours,
+overnight, while they are away), set up **one** local `CronCreate` job:
 
-Stagger the minutes so the three ticks don't collide:
+- **Schedule:** `7,37 * * * *` (every half hour, off the busy :00/:30 marks),
+  recurring.
+- **Prompt:** `[cleanvibe cron] Commit and push any and all changes, then
+  continue working on the queue.`
 
-1. **Work-loop cron — `3 * * * *` (hourly at :03).** The engine. Each tick does, in order:
-   - **(a) SYNC** — `git fetch origin`; fast-forward or rebase the working branch (never force-push, never `reset --hard`, never discard a sibling machine's work).
-   - **(b) WORK** — take the top actionable item from `queue.md` and do it. If nothing in `queue.md` is actionable (all blocked / needs user / a product decision), promote the next *genuinely-unblocked, bounded, verifiable* `todo.md` item — **plan it into `queue.md` first**, mirror to the task tool, then execute.
-   - **(c) HARD RAILS** — never fake; never weaken / skip / delete a test to make it pass; never claim "works" / "verified" / "passes" without having actually RUN it and measured. A real defect → strict `xfail` or a precise documented blocker, never a loosened assertion. Don't implement what you don't 100% understand — write the spec / queue item instead. Name unbuilt or hard things plainly; don't paper over difficulty. Verify CI green, not just local — local-green does not imply CI-green.
-   - **(d) COMMIT** — commit early/often with *why*; update `queue.md` in the same commit (delete completed items); append the dated entry to `devlog.md`; mark task-tool items done; push.
-   - **(e) REPORT** — one line: the commit shas advanced, or `nothing actionable; <reason>`.
+That's the whole loop. Each time it fires:
 
-2. **Auto-flush cron — `15 * * * *` (hourly at :15).** The backstop. Commit + push all pending work so nothing sits uncommitted between manual pushes; report shas or "nothing pending". Only commit / push when something is actually pending — no empty commits.
+1. **Commit and push** everything that has changed, with messages that say what
+   and why. Push only if the repo has a remote. No empty commits.
+2. **Continue working on the queue.** Take the top item in `queue.md` you can
+   do and do it, then the next, for as long as it makes sense. Delete finished
+   items from `queue.md` and log them in `devlog.md` in the same commit.
+3. **When the queue runs dry, refill it before idling.** In a research project,
+   take the top open question in `research/SUMMARY.md`, plan it into
+   `queue.md`, and work it. Otherwise take the next `todo.md` item that is
+   unblocked, bounded and checkable. If there is truly nothing, the tick is
+   **idle**: say so in one line. An idle tick is normal, not a problem to solve.
 
-3. **Status-report cron — `42 * * * *` (hourly at :42).** The heartbeat — **reporting only, no code changes.** Covers: what advanced since the last report (shas + one-line each); current `queue.md` state; how the work held the hard rails (and any place it brushed one); blockers, each tagged with exactly one of the disjoint not-done taxonomy — NEEDS-DECISION / BLOCKED-ON-USER-ACTION / BLOCKED-ON-EXTERNAL / NEEDS-INVESTIGATION / UNSAFE-TO-GUESS / OUT-OF-SCOPE — naming the specific decision / user-action / external signal / risk / owner (LOAD-BEARING DEFAULT: if a not-done item fits none of these with a specifically-named blocker, it is NOT deferred — DO IT NOW); test-suite health.
+The job is session-local (`durable: false`): it fires only while this session
+runs, so a later session sets it up again if the user still wants autonomous
+work.
 
-**Why this exists:** the most common autonomous-agent failure is doing a large amount of work and silently losing the thread of what it is doing. The work-loop forces steady, verifiable, committed progress; the auto-flush guarantees nothing is lost between ticks; the status-report keeps the thread legible.
+## The work keeps the project's normal standards
+- Claim something works only after running it. Never weaken, skip or delete a
+  test to get green; record the defect instead.
+- If you don't understand something well enough to do it, write the question
+  down (a queue item, or `INTENT.md`) instead of guessing.
 
-**Lifecycle around a large-scale queue fill:**
+These are how the work is done, not reasons to stop the loop.
 
-- **(a) START all three crons at the beginning of any extensive work session.** A fresh session has none of them running, so the opening move — the first queue item — is to *create them*.
-- **(b) On a mid-session large-scale queue RE-FILL** (a planning burst that repopulates the queue), the FIRST item of that fill **kills the running crons**, then the work items follow top to bottom, and the pinned tail restarts them.
-- **(c) Entering planning mode DISABLES the crons.** Their restart therefore lives at the **end** of the queue, not the beginning of the next burst.
-- **(d) The LAST TWO queue items, always kept pinned at the tail, are:**
-  1. **Ensure the three crons are running** — start them if this session never did, restart them if a planning burst / queue re-fill killed them.
-  2. **Run the status-report action once more, independently** — an end-of-session summary of everything that happened this session.
+## Keep it running
+- **Do not turn the cron off yourself.** Not because the queue is empty, not
+  because a tick failed, not because something looks risky, and not at the
+  end of a burst of work. Only the user stops it (directly, or through the
+  `emergency-stop` skill).
+- If something goes wrong, say so plainly in your next message and carry on
+  with whatever is still safe to do.
+- In a cleanvibe project, the thirty-minute intake in CLAUDE.md decides when
+  the loop starts. Elsewhere, start it when the user asks for autonomous work.
 
-In short: a fresh session **starts** the crons up front and the tail **ensures they are still running** + summarizes; a mid-session re-fill **kills** them up front and the tail **restarts** them + summarizes. Either way the queue both opens and closes on the cron set.
+**Why one cron:** earlier versions ran separate hourly work, flush and status
+crons. In practice the flushes and status reports weren't useful, and one
+item per hour left long idle stretches (case study 05). One half-hourly
+"commit, push, keep going" does the work with less ceremony.
 
-**Replication projects are exempt.** This is for `new` / general extensive work only — a bounded paper replication does not get the hourly heartbeat.
+Replication projects (`cleanvibe replicate`) are bounded jobs and do not use
+the loop.

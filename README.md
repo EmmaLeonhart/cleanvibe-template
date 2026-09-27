@@ -1,17 +1,10 @@
 # cleanvibe-template
 
-> Scaffolded with [cleanvibe](https://github.com/Immanuelle/cleanvibe).
+> Started with [cleanvibe](https://github.com/EmmaLeonhart/cleanvibe) on 2026-09-27.
+> What it is for has not been written down yet; see `INTENT.md`.
 
-## About
+## Working on it
 
-_TODO: Describe what this project does._
-
-## Getting Started
-
-This project was initialized with `cleanvibe new` and is intended to be developed
-with AI-assisted coding via Claude Code.
-
-```
-cd cleanvibe-template
-claude
-```
+Run `cleanvibe` in this folder (or double-click `!runClaude.bat` on Windows) to
+open a new Claude session here. It starts with Remote Control on, so you can
+continue from the Claude app or web. Earlier sessions are in `sessions/`.
