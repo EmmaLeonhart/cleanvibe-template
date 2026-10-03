@@ -12,17 +12,20 @@ judgment, so the history is exact:
    (the user's drops, new directories), except the project's own files, into
    `data_lake/`, and commit that move on its own.
 3. Print a report for the agent: the two commits, what moved where, the files
-   now in `data_lake/`, and how much the user has said in the chat so far
-   (counted from the transcripts in `sessions/`).
+   now in `data_lake/`, how much the user has said in the chat so far and how
+   long ago their last message was (from the transcripts in `sessions/`), and
+   a verdict: stay in chat mode (with the time of the next Mode check) or
+   start work mode.
 
-It records `intake_at` in `.cleanvibe.json` and does nothing on later runs.
+It records `intake_at` in `.cleanvibe.json`. Later runs (the Mode check) commit
+and move nothing; they print only the chat report and the verdict.
 Stdlib only. Exit code 0 on success, 1 if a git step failed.
 """
 
 import json
 import subprocess
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -43,8 +46,8 @@ _NOT_USER = (
     "This is the first ever session in a new project",
     "This is a new session in an existing cleanvibe project",
 )
-SUBSTANTIAL_MESSAGES = 2
-SUBSTANTIAL_CHARS = 300
+# An hour without a message from the user means the chat is over: work mode starts.
+ABSENT_MINUTES = 60
 
 
 def git(*args):
@@ -105,9 +108,18 @@ def _text(entry):
     return ""
 
 
+def _when(entry):
+    """The entry's timestamp as an aware datetime, or None."""
+    try:
+        return datetime.fromisoformat(str(entry.get("timestamp")).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
 def engagement():
-    """(messages, characters) the user sent, from sessions/*.jsonl."""
+    """(messages, characters, time of the last message or None) the user sent, from sessions/*.jsonl."""
     messages = chars = 0
+    last = None
     for log in sorted((ROOT / "sessions").glob("*.jsonl")):
         try:
             lines = log.read_text(encoding="utf-8").splitlines()
@@ -115,14 +127,54 @@ def engagement():
             continue
         for line in lines:
             try:
-                text = _text(json.loads(line)).strip()
+                entry = json.loads(line)
+                text = _text(entry).strip()
             except ValueError:
                 continue
             if not text or text.startswith("<") or text.startswith(_NOT_USER):
                 continue
             messages += 1
             chars += len(text)
-    return messages, chars
+            when = _when(entry)
+            if when and (last is None or when > last):
+                last = when
+    return messages, chars, last
+
+
+def chat_report(marker, lake_files, messages, chars, last):
+    """The chat part of the report and the verdict: chat mode or work mode."""
+    now = datetime.now(timezone.utc)
+    print(f"- User engagement so far: {messages} message(s), {chars} characters "
+          f"(not counting cleanvibe's own prompts)")
+    print(f"- Material in {LAKE}/: {'yes' if lake_files else 'none'}; folder name: "
+          f"{'generated (says nothing)' if marker.get('auto_named') else 'chosen by the user'}")
+    if messages:
+        # A message without a timestamp counts as just now: stay in chat mode.
+        age = (now - last).total_seconds() / 60 if last else 0.0
+        print(f"- User's last message: {age:.0f} minute(s) ago")
+        if age >= ABSENT_MINUTES:
+            print(f"- Verdict: WORK MODE. The user has been quiet for {ABSENT_MINUTES}+ minutes, "
+                  "so the chat is over. Start work mode now, with the chat as the subject.")
+            return
+        check = (last or now) + timedelta(minutes=ABSENT_MINUTES)
+        check = max(check, now + timedelta(minutes=2)).astimezone()  # local time for CronCreate
+        print("- Verdict: CHAT MODE. The user was here recently: stay light and "
+              "conversational, and do not start work. Schedule the Mode check as a "
+              f"one-time job at {check:%H:%M} local (cron "
+              f"`{check.minute} {check.hour} {check.day} {check.month} *`, recurring: false), "
+              "unless the user tells you to start working first.")
+    elif lake_files:
+        print("- Verdict: WORK MODE. The user has said nothing, but there is material. "
+              "Assume they are away and that the folder holds the context they meant to "
+              "give: start work mode now.")
+    elif not marker.get("auto_named"):
+        print("- Verdict: NAME ONLY. No material and no chat. Start work mode only if the "
+              "folder name plainly states a task; otherwise treat this as NOTHING TO GO ON.")
+    else:
+        print("- Verdict: NOTHING TO GO ON. No material, no chat, and a generated "
+              "name. Do not invent work from circumstance (a guess about why the project "
+              "exists is not a task), do not plan, do not start work mode. Say so in "
+              "INTENT.md and wait for the user.")
 
 
 def free_name(name):
@@ -138,11 +190,15 @@ def free_name(name):
 def main():
     marker = load_marker()
     if marker.get("intake_at"):
-        print(f"Intake already done at {marker['intake_at']}; nothing to do.")
+        print(f"# Mode check\n\n- Intake already done at {marker['intake_at']}; "
+              "nothing committed or moved.")
+        lake_files = [p for p in git("ls-files", "--", LAKE).stdout.splitlines()
+                      if not p.endswith(".gitkeep")]
+        chat_report(marker, lake_files, *engagement())
         return 0
 
     moving = never_committed_entries()
-    messages, chars = engagement()
+    messages, chars, last = engagement()
 
     git("add", "-A")
     first = None
@@ -176,7 +232,6 @@ def main():
 
     lake_files = [p for p in git("ls-files", "--", LAKE).stdout.splitlines()
                   if not p.endswith(".gitkeep")]
-    substantial = messages >= SUBSTANTIAL_MESSAGES or chars >= SUBSTANTIAL_CHARS
 
     print("# Thirty-minute intake report\n")
     print(f"- Snapshot commit: {first or '(nothing new to commit)'}")
@@ -187,30 +242,7 @@ def main():
         print(f"  - {path}")
     if len(lake_files) > 200:
         print(f"  - ... and {len(lake_files) - 200} more")
-    print(f"- User engagement so far: {messages} message(s), {chars} characters "
-          f"(not counting cleanvibe's own prompts)")
-    print(f"- Material in {LAKE}/: {'yes' if lake_files else 'none'}; folder name: "
-          f"{'generated (says nothing)' if marker.get('auto_named') else 'chosen by the user'}")
-    if substantial:
-        print("- Verdict: SUBSTANTIAL engagement. The user is present (this counts "
-              "messages; it cannot tell steering from chatting): schedule the work loop "
-              "to start in 60 minutes rather than now.")
-    elif messages and not lake_files:
-        print("- Verdict: SOME ENGAGEMENT, no material. What the user said is the subject: "
-              "plan research on it and start the work loop now.")
-    elif lake_files:
-        print("- Verdict: LITTLE OR NO engagement, but there is material. Assume the user "
-              "is away and that the folder holds the context they meant to give: start "
-              "the work loop now.")
-    elif not marker.get("auto_named"):
-        print("- Verdict: NAME ONLY. No material and no engagement. Start work only if the "
-              "folder name plainly states a task; otherwise treat this as NOTHING TO GO ON.")
-    else:
-        print("- Verdict: NOTHING TO GO ON. No material, no engagement, and a generated "
-              "name. Do not invent work from circumstance (a guess about why the project "
-              "exists is not a task), do not plan, do not start the work loop. Say so in "
-              "INTENT.md and wait "
-              "for the user.")
+    chat_report(marker, lake_files, messages, chars, last)
     return 0
 
 

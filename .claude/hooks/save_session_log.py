@@ -83,7 +83,15 @@ def render(entries, title):
         out.extend([text, ""])
 
     for e in entries:
-        if e.get("isMeta") or e.get("isSidechain"):
+        if e.get("isSidechain"):
+            continue
+        if e.get("isMeta"):
+            # Scheduled [cleanvibe cron] prompts are meta entries; show them so a
+            # reader catching up can see what triggered the actions that follow.
+            if e.get("type") == "user":
+                text = _clean(_result_text((e.get("message") or {}).get("content")))
+                if text.startswith("[cleanvibe cron]"):
+                    say("Cron", text)
             continue
         kind = e.get("type")
         if kind == "attachment":
