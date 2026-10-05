@@ -200,6 +200,8 @@ hand.
 - `scratch/`: one-off work, gitignored.
 - `.claude/scripts/data_lake_intake.py`: the thirty-minute intake and the Mode
   check.
+- `.claude/hooks/intent_staleness.py`: on each loop tick, tells you how long
+  `INTENT.md` has gone without a commit, so you can tell whether it is due.
 
 ## Skills
 
@@ -228,4 +230,4 @@ LOAD-BEARING DEFAULT: if it fits none of these with a specifically-named blocker
 deferred — DO IT NOW. Bare "deliberately not done" / "blocked on <person>" is banned.
 
 # currentDate
-Today's date is 2026-10-03.
+Today's date is 2026-10-05.
